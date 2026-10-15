@@ -16,17 +16,20 @@ function D = ttAssignPhases(D, varargin)
 %   D.sessions gains phase, stageIndex (position within the animal's sessions of that stage, from 1)
 %   and stageIndexFromEnd (-1 = last session of the stage); D.trials gains phase.
 %   A single-delay session below the animal's final delay (the largest level of its sessions before
-%   the first switching session) that is followed by a session with a larger delay belongs to
-%   delay training; its stage is set to "delayTraining" in D.sessions and D.trials.
+%   the first switching session) that is followed, before any switching session, by a session with
+%   a larger delay or by a session with several delay levels belongs to delay training; its stage
+%   is set to "delayTraining" in D.sessions and D.trials.
 p = inputParser; p.addParameter('delaySplit', 2, @isnumeric); p.addParameter('fixedSplit', 1, @isnumeric); p.addParameter('tol', 0.05, @isnumeric); p.parse(varargin{:}); o = p.Results;
 S = D.sessions; ph = repmat("other", height(S), 1); si = nan(height(S), 1); se = nan(height(S), 1);
 maxLevel = arrayfun(@(s) max([str2num(char(s)), NaN]), S.delayLevels); %#ok<ST2NM>
+nLevel = arrayfun(@(s) numel(str2num(char(s))), S.delayLevels); %#ok<ST2NM>
 for a = unique(S.animal)'
-    ia = find(S.animal == a); [~, ord] = sort(S.sessionIndex(ia)); ia = ia(ord); st = S.stage(ia); ml = maxLevel(ia);
+    ia = find(S.animal == a); [~, ord] = sort(S.sessionIndex(ia)); ia = ia(ord); st = S.stage(ia); ml = maxLevel(ia); nl = nLevel(ia);
     firstSw = find(st == "switching", 1); if isempty(firstSw), pre = true(numel(ia), 1); else, pre = (1:numel(ia))' < firstSw; end
     target = max(ml(pre & st ~= "cueAssociation")); if isempty(target), target = NaN; end
     for k = find(st == "fixedDelay" & pre)'
-        if ml(k) < target - o.tol && any(ml(k+1:end) > ml(k) + o.tol & pre(k+1:end)), st(k) = "delayTraining"; end
+        later = pre; later(1:k) = false;
+        if ml(k) < target - o.tol && any(later & (ml > ml(k) + o.tol | (nl > 1 & st == "delayTraining"))), st(k) = "delayTraining"; end
     end
     S.stage(ia) = st;
     for stage = ["cueAssociation", "delayTraining", "fixedDelay", "switching"]
