@@ -34,9 +34,8 @@ for a = animals
         [~, sid] = fileparts(files(f).name); T = ttLoadSession(L.S, 'animal', a, 'session', sid);
         if sum(T.cued) < o.minTrials, continue; end
         k = k + 1; T.sessionIndex = repmat(k, height(T), 1);
-        dc = T.delay(T.cued); st = ttClassifyStage(dc, height(T), o.stageOptions{:});
+        dc = T.delay(T.cued); [st, lv] = ttClassifyStage(dc, height(T), o.stageOptions{:});
         tok = regexp(sid, '_(\d{6})_(\d{6})$', 'tokens', 'once'); dt = NaT; if ~isempty(tok), dt = datetime([tok{1}, tok{2}], 'InputFormat', 'yyMMddHHmmss'); end
-        lv = unique(round(dc, 2)); lv = lv(lv > 0.05);
         sessions{end+1} = table(a, string(sid), k, dt, height(T), sum(T.cued), sum(T.cued & T.rewarded), sum(T.noCue), string(mat2str(lv', 3)), mean(dc), st, ...
             'VariableNames', {'animal', 'session', 'sessionIndex', 'date', 'nTrials', 'nCued', 'nRewarded', 'nNoCue', 'delayLevels', 'delayMean', 'stage'}); %#ok<AGROW>
         T.stage = repmat(st, height(T), 1); trials{end+1} = T; %#ok<AGROW>
