@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "timingtask-rl: reinforcement-learning models of lick timing in the self-timed licking task"
+authors:
+  - family-names: Majumder
+    given-names: Shouvik
+license: MIT
+repository-code: "https://github.com/shouvik-majumder/timingtask-rl"
+year: 2026
