@@ -25,7 +25,11 @@ for lev = unique(P.(o.by), 'stable')'
     rows{end+1} = table(string(measure), string(lev), string(groupA), string(groupB), numel(va), numel(vb), height(A), height(B), median(va), median(vb), d0, prctile(db, 2.5), prctile(db, 97.5), pPerm, ...
         'VariableNames', {'measure', 'level', 'groupA', 'groupB', 'nAnimalsA', 'nAnimalsB', 'nSessionsA', 'nSessionsB', 'medianA', 'medianB', 'diff', 'ci_lo', 'ci_hi', 'p_perm'}); %#ok<AGROW>
 end
-if isempty(rows), G = table(); else, G = vertcat(rows{:}); end
+if isempty(rows)
+    G = table('Size', [0 14], 'VariableTypes', [repmat({'string'}, 1, 4), repmat({'double'}, 1, 10)], 'VariableNames', {'measure', 'level', 'groupA', 'groupB', 'nAnimalsA', 'nAnimalsB', 'nSessionsA', 'nSessionsB', 'medianA', 'medianB', 'diff', 'ci_lo', 'ci_hi', 'p_perm'});
+else
+    G = vertcat(rows{:});
+end
 end
 function [v, cells] = perAnimal(Q)
 an = unique(Q.animal); v = nan(numel(an), 1); cells = cell(numel(an), 1);

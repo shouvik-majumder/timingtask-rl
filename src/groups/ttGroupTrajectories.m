@@ -21,7 +21,7 @@ for g = groups
         rows{end+1} = table(g, x, numel(an), median(v), prctile(v, 25), prctile(v, 75), 'VariableNames', {'group', 'x', 'nAnimals', 'median', 'q25', 'q75'}); %#ok<AGROW>
     end
 end
-M = vertcat(rows{:}); fig = [];
+if isempty(rows), M = table('Size', [0 6], 'VariableTypes', {'string', 'double', 'double', 'double', 'double', 'double'}, 'VariableNames', {'group', 'x', 'nAnimals', 'median', 'q25', 'q75'}); else, M = vertcat(rows{:}); end; fig = [];
 if o.plot
     fig = figure('Color', 'w', 'Visible', 'off', 'Position', [50 50 700 420]); hold on; cols = o.colors; if isempty(cols), cols = lines(numel(groups)); end; hh = gobjects(numel(groups), 1);
     for i = 1:numel(groups)
